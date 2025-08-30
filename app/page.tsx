@@ -17,19 +17,22 @@ export default function Home() {
                 </h1>
               </div>
             </div>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-8">
-                <Link href="#features" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Features
-                </Link>
-                <Link href="#about" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  About
-                </Link>
-                <Link href="#contact" className="text-slate-600 hover:text-slate-900 transition-colors">
-                  Contact
-                </Link>
+                          <div className="hidden md:block">
+                <div className="ml-10 flex items-baseline space-x-8">
+                  <Link href="#features" className="text-slate-600 hover:text-slate-900 transition-colors">
+                    Features
+                  </Link>
+                  <Link href="/planner/demo" className="text-slate-600 hover:text-slate-900 transition-colors">
+                    Demo
+                  </Link>
+                  <Link href="#about" className="text-slate-600 hover:text-slate-900 transition-colors">
+                    About
+                  </Link>
+                  <Link href="#contact" className="text-slate-600 hover:text-slate-900 transition-colors">
+                    Contact
+                  </Link>
+                </div>
               </div>
-            </div>
             <div className="flex items-center space-x-4">
               <Link
                 href="/auth/login"
