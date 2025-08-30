@@ -184,6 +184,10 @@
 }
 
 @layer utilities {
+  .font-playfair {
+    font-family: var(--font-playfair), serif;
+  }
+  
   .custom-bg {
     background:
       linear-gradient(
