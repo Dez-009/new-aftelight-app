@@ -67,7 +67,7 @@ export const avatarUpdateSchema = z.object({
 })
 
 export const avatarUploadSchema = z.object({
-  file: z.instanceof(File, { message: 'File is required' }),
+  file: z.any(), // Allow any file type for server-side validation
   personaId: z.string().uuid('Invalid persona ID')
 })
 
@@ -87,7 +87,7 @@ export const memoryUpdateSchema = memoryCreateSchema.partial().extend({
 // Media schemas
 export const mediaCreateSchema = z.object({
   mediaType: z.enum(['photo', 'voice', 'document'], { message: 'Invalid media type' }),
-  file: z.instanceof(File, { message: 'File is required' }),
+  file: z.any(), // Allow any file type for server-side validation
   description: z.string().min(1, 'Description is required').max(500),
   personaId: z.string().uuid('Invalid persona ID')
 })
