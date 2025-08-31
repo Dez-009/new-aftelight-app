@@ -88,6 +88,15 @@ class Settings(BaseSettings):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
+        # Railway-specific environment handling
+        if os.getenv('RAILWAY_ENVIRONMENT'):
+            self.ENVIRONMENT = os.getenv('RAILWAY_ENVIRONMENT', 'development')
+            self.DEBUG = self.ENVIRONMENT == "development"
+        
+        # Railway automatically provides PORT
+        if os.getenv('PORT'):
+            self.PORT = int(os.getenv('PORT'))
+        
         # Build database URL if not provided
         if not self.DATABASE_URL:
             if self.DATABASE_PASSWORD:
