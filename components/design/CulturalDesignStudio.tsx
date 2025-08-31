@@ -17,7 +17,11 @@ import {
   Wand2,
   Lightbulb,
   Globe,
-  BookOpen
+  BookOpen,
+  Plus,
+  Trash2,
+  Move,
+  RotateCw
 } from 'lucide-react'
 import { mockPrintProducts } from '../../lib/printServices'
 
@@ -130,7 +134,7 @@ const culturalThemes: CulturalTheme[] = [
     fonts: ['Noto Sans', 'Arial', 'Helvetica'],
     patterns: ['lotus', 'dharma-wheel', 'buddha', 'peace'],
     symbols: ['🪷', '☸', '🧘', '☮️'],
-    preview: '/images/themes/buddhist-traditional.jpg'
+    preview: '/images/themes/christian-traditional.jpg'
   },
   {
     id: 'hindu-traditional',
@@ -147,7 +151,7 @@ const culturalThemes: CulturalTheme[] = [
     fonts: ['Noto Sans Devanagari', 'Arial', 'Helvetica'],
     patterns: ['om-symbol', 'lotus', 'swastika', 'diya'],
     symbols: ['🕉️', '🪷', '🕯️', '🪔'],
-    preview: '/images/themes/hindu-traditional.jpg'
+    preview: '/images/themes/christian-traditional.jpg'
   }
 ]
 
@@ -411,20 +415,23 @@ export function CulturalDesignStudio() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50 to-orange-50 dark:from-slate-900 dark:via-amber-950 dark:to-orange-950">
       <div className="container mx-auto p-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full mb-6 shadow-lg">
+            <Palette className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-5xl font-bold text-slate-900 dark:text-white mb-4 font-playfair bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 bg-clip-text text-transparent">
             Cultural Design Studio
           </h1>
-          <p className="text-slate-600 dark:text-slate-300 text-lg">
+          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
             Create beautiful, culturally appropriate memorial designs with AI assistance
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Left Sidebar - Tools & Themes */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="xl:col-span-1 space-y-6">
             {/* Cultural Theme Selection */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-amber-200/50 dark:border-amber-700/50 shadow-xl p-6">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
                 <Globe className="w-5 h-5 mr-2 text-amber-600" />
                 Cultural Themes
@@ -437,19 +444,19 @@ export function CulturalDesignStudio() {
                       setSelectedTheme(theme)
                       initializeDesign(theme)
                     }}
-                    className={`w-full p-3 rounded-lg border-2 transition-all duration-200 text-left ${
+                    className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left hover:scale-105 ${
                       selectedTheme?.id === theme.id
-                        ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-600'
+                        ? 'border-amber-500 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 shadow-lg'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-600 bg-white dark:bg-slate-700'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg"
                            style={{ backgroundColor: theme.colors.primary }}>
                         {theme.culture[0]}
                       </div>
                       <div>
-                        <div className="font-medium text-slate-900 dark:text-white">{theme.name}</div>
+                        <div className="font-semibold text-slate-900 dark:text-white">{theme.name}</div>
                         <div className="text-xs text-slate-500 dark:text-slate-400">{theme.culture}</div>
                       </div>
                     </div>
@@ -459,7 +466,7 @@ export function CulturalDesignStudio() {
             </div>
 
             {/* Design Tools */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-amber-200/50 dark:border-amber-700/50 shadow-xl p-6">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
                 <Palette className="w-5 h-5 mr-2 text-amber-600" />
                 Design Tools
@@ -467,37 +474,37 @@ export function CulturalDesignStudio() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => addElement('text')}
-                  className="p-3 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-800/40 rounded-lg transition-all duration-200"
+                  className="group p-4 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 hover:from-amber-200 dark:hover:from-amber-800/50 rounded-xl transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
                 >
-                  <Type className="w-5 h-5 text-amber-600 mx-auto mb-2" />
+                  <Type className="w-6 h-6 text-amber-600 mx-auto mb-2 group-hover:scale-110 transition-transform duration-200" />
                   <span className="text-sm font-medium text-slate-900 dark:text-white">Text</span>
                 </button>
                 <button
                   onClick={() => addElement('shape')}
-                  className="p-3 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-800/40 rounded-lg transition-all duration-200"
+                  className="group p-4 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 hover:from-amber-200 dark:hover:from-amber-800/50 rounded-xl transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
                 >
-                  <Layers className="w-5 h-5 text-amber-600 mx-auto mb-2" />
+                  <Layers className="w-6 h-6 text-amber-600 mx-auto mb-2 group-hover:scale-110 transition-transform duration-200" />
                   <span className="text-sm font-medium text-slate-900 dark:text-white">Shape</span>
                 </button>
                 <button
                   onClick={() => addElement('image')}
-                  className="p-3 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-800/40 rounded-lg transition-all duration-200"
+                  className="group p-4 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 hover:from-amber-200 dark:hover:from-amber-800/50 rounded-xl transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
                 >
-                  <ImageIcon className="w-5 h-5 text-amber-600 mx-auto mb-2" />
+                  <ImageIcon className="w-6 h-6 text-amber-600 mx-auto mb-2 group-hover:scale-110 transition-transform duration-200" />
                   <span className="text-sm font-medium text-slate-900 dark:text-white">Image</span>
                 </button>
                 <button
                   onClick={() => addElement('background')}
-                  className="p-3 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-800/40 rounded-lg transition-all duration-200"
+                  className="group p-4 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 hover:from-amber-200 dark:hover:from-amber-800/50 rounded-xl transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
                 >
-                  <Palette className="w-5 h-5 text-amber-600 mx-auto mb-2" />
+                  <Palette className="w-6 h-6 text-amber-600 mx-auto mb-2 group-hover:scale-110 transition-transform duration-200" />
                   <span className="text-sm font-medium text-slate-900 dark:text-white">Background</span>
                 </button>
               </div>
             </div>
 
             {/* AI Assistant */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-amber-200/50 dark:border-amber-700/50 shadow-xl p-6">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
                 <Sparkles className="w-5 h-5 mr-2 text-amber-600" />
                 AI Assistant
@@ -505,32 +512,32 @@ export function CulturalDesignStudio() {
               <button
                 onClick={generateAIDesign}
                 disabled={isGenerating}
-                className="w-full p-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
+                className="w-full p-4 bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 hover:from-amber-700 hover:via-orange-700 hover:to-rose-700 text-white rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 {isGenerating ? (
                   <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
                     Generating...
                   </div>
                 ) : (
                   <div className="flex items-center justify-center">
-                    <Wand2 className="w-4 h-4 mr-2" />
+                    <Wand2 className="w-5 h-5 mr-2" />
                     Generate AI Design
                   </div>
                 )}
               </button>
               {aiSuggestion && (
-                <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-700">
-                  <div className="flex items-start space-x-2">
-                    <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-amber-800 dark:text-amber-200">{aiSuggestion}</p>
+                <div className="mt-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-200 dark:border-amber-700">
+                  <div className="flex items-start space-x-3">
+                    <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">{aiSuggestion}</p>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Actions */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-amber-200/50 dark:border-amber-700/50 shadow-xl p-6">
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
                 <Settings className="w-5 h-5 mr-2 text-amber-600" />
                 Actions
@@ -538,14 +545,14 @@ export function CulturalDesignStudio() {
               <div className="space-y-3">
                 <button
                   onClick={exportDesign}
-                  className="w-full p-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-all duration-200 flex items-center justify-center"
+                  className="w-full p-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center hover:scale-105 shadow-md hover:shadow-lg"
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Export Design
                 </button>
                 <button
                   onClick={resetDesign}
-                  className="w-full p-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-medium transition-all duration-200 flex items-center justify-center"
+                  className="w-full p-3 bg-gradient-to-r from-slate-600 to-gray-600 hover:from-slate-700 hover:to-gray-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center hover:scale-105 shadow-md hover:shadow-lg"
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset Design
@@ -555,17 +562,17 @@ export function CulturalDesignStudio() {
           </div>
 
           {/* Main Canvas Area */}
-          <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+          <div className="xl:col-span-2">
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-amber-200/50 dark:border-amber-700/50 shadow-xl p-8">
               {/* Canvas Toolbar */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={() => setViewMode('design')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                    className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                       viewMode === 'design'
-                        ? 'bg-amber-600 text-white'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                        ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg'
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                     }`}
                   >
                     <Eye className="w-4 h-4 mr-2 inline" />
@@ -573,26 +580,26 @@ export function CulturalDesignStudio() {
                   </button>
                   <button
                     onClick={() => setViewMode('preview')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                    className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                       viewMode === 'preview'
-                        ? 'bg-amber-600 text-white'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                        ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg'
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                     }`}
                   >
                     <EyeOff className="w-4 h-4 mr-2 inline" />
                     Preview Mode
                   </button>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   <button
                     onClick={() => setShowLayers(!showLayers)}
-                    className={`p-2 rounded-lg transition-all duration-200 ${
+                    className={`p-3 rounded-xl transition-all duration-300 ${
                       showLayers
-                        ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                        ? 'bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 text-amber-600 shadow-md'
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
                     }`}
                   >
-                    <Layers className="w-4 h-4" />
+                    <Layers className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -601,7 +608,7 @@ export function CulturalDesignStudio() {
               <div className="relative">
                 <div
                   ref={canvasRef}
-                  className="mx-auto border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg relative overflow-hidden"
+                  className="mx-auto border-2 border-dashed border-amber-300 dark:border-amber-600 rounded-2xl relative overflow-hidden shadow-2xl"
                   style={{
                     width: canvasSize.width,
                     height: canvasSize.height,
@@ -612,9 +619,9 @@ export function CulturalDesignStudio() {
                     <div
                       key={element.id}
                       onClick={() => setSelectedElement(element)}
-                      className={`absolute cursor-pointer transition-all duration-200 ${
+                      className={`absolute cursor-pointer transition-all duration-300 hover:scale-105 ${
                         selectedElement?.id === element.id
-                          ? 'ring-2 ring-amber-500 ring-offset-2'
+                          ? 'ring-4 ring-amber-500 ring-offset-2'
                           : ''
                       }`}
                       style={{
@@ -632,19 +639,19 @@ export function CulturalDesignStudio() {
                         backgroundColor: element.styles.backgroundColor,
                         border: element.styles.borderWidth ? `${element.styles.borderWidth}px solid ${element.styles.borderColor}` : 'none',
                         borderRadius: element.styles.borderRadius ? `${element.styles.borderRadius}px` : '0',
-                        boxShadow: element.styles.shadow || 'none'
+                        boxShadow: element.styles.shadow || '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                       }}
                     >
                       {element.type === 'text' ? (
-                        <div className="w-full h-full flex items-center justify-center text-center">
+                        <div className="w-full h-full flex items-center justify-center text-center p-2">
                           {element.content}
                         </div>
                       ) : element.type === 'shape' ? (
-                        <div className="w-full h-full flex items-center justify-center text-center">
+                        <div className="w-full h-full flex items-center justify-center text-center p-2">
                           {element.content}
                         </div>
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-center">
+                        <div className="w-full h-full flex items-center justify-center text-center p-2">
                           {element.content}
                         </div>
                       )}
@@ -656,10 +663,10 @@ export function CulturalDesignStudio() {
           </div>
 
           {/* Right Sidebar - Properties & Layers */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="xl:col-span-1 space-y-6">
             {/* Element Properties */}
             {selectedElement && (
-              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-amber-200/50 dark:border-amber-700/50 shadow-xl p-6">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
                   <Settings className="w-5 h-5 mr-2 text-amber-600" />
                   Element Properties
@@ -674,7 +681,7 @@ export function CulturalDesignStudio() {
                       type="text"
                       value={selectedElement.content}
                       onChange={(e) => updateElement(selectedElement.id, { content: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200"
+                      className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200"
                     />
                   </div>
 
@@ -772,7 +779,7 @@ export function CulturalDesignStudio() {
                           onChange={(e) => updateElement(selectedElement.id, {
                             styles: { ...selectedElement.styles, color: e.target.value }
                           })}
-                          className="w-full h-10 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer"
+                          className="w-full h-12 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer"
                         />
                       </div>
                     </div>
@@ -781,8 +788,9 @@ export function CulturalDesignStudio() {
                   {/* Delete Button */}
                   <button
                     onClick={() => deleteElement(selectedElement.id)}
-                    className="w-full p-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all duration-200"
+                    className="w-full p-3 bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center hover:scale-105 shadow-md hover:shadow-lg"
                   >
+                    <Trash2 className="w-4 h-4 mr-2" />
                     Delete Element
                   </button>
                 </div>
@@ -791,7 +799,7 @@ export function CulturalDesignStudio() {
 
             {/* Layers Panel */}
             {showLayers && (
-              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-amber-200/50 dark:border-amber-700/50 shadow-xl p-6">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4 flex items-center">
                   <Layers className="w-5 h-5 mr-2 text-amber-600" />
                   Layers
@@ -801,21 +809,21 @@ export function CulturalDesignStudio() {
                     <div
                       key={element.id}
                       onClick={() => setSelectedElement(element)}
-                      className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                      className={`p-3 rounded-lg cursor-pointer transition-all duration-200 hover:scale-105 ${
                         selectedElement?.id === element.id
-                          ? 'bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600'
+                          ? 'bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 border border-amber-300 dark:border-amber-600'
                           : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 rounded-full"
+                          <div className="w-3 h-3 rounded-full shadow-sm"
                                style={{ backgroundColor: element.styles.color }}></div>
                           <span className="text-sm font-medium text-slate-900 dark:text-white">
                             {element.type} - {element.content.substring(0, 20)}
                           </span>
                         </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                           Z-{element.zIndex}
                         </div>
                       </div>
