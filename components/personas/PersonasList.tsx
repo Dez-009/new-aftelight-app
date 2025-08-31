@@ -77,9 +77,9 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
   // Mock user subscription data - in real app this comes from database
   const mockUserSubscription = {
     tier: 'free' as const,
-    maxPersonas: 1,
+    maxPersonas: personasLimit,
     currentPersonas: personas.length,
-    canCreateNew: personas.length < 1
+    canCreateNew: personas.length < personasLimit
   }
 
   const filteredPersonas = personas.filter(persona => {
@@ -149,12 +149,10 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
             My Personas
           </h2>
           <p className="text-slate-600 dark:text-slate-300">
-            {filteredPersonas.length} of {personas.length} personas
-            {upgradeMessage && (
-              <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">
-                • {mockUserSubscription.tier} tier limit: {mockUserSubscription.maxPersonas}
-              </span>
-            )}
+            {personas.length} of {mockUserSubscription.maxPersonas} personas
+            <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">
+              • {mockUserSubscription.tier} tier limit: {mockUserSubscription.maxPersonas}
+            </span>
           </p>
         </div>
         
@@ -166,9 +164,10 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
               ? 'bg-amber-600 hover:bg-amber-700 text-white'
               : 'bg-slate-400 text-slate-200 cursor-not-allowed'
           }`}
+          title={!mockUserSubscription.canCreateNew ? `Upgrade to create more than ${mockUserSubscription.maxPersonas} persona(s)` : 'Create a new persona'}
         >
           <Plus className="w-4 h-4" />
-          <span>Create New Persona</span>
+          <span>{mockUserSubscription.canCreateNew ? 'Create New Persona' : 'Upgrade to Create More'}</span>
         </button>
       </div>
 
@@ -278,12 +277,25 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
                       </div>
                     )}
                     <button 
-                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200"
+                      className={`transition-colors duration-200 ${
+                        index >= mockUserSubscription.maxPersonas
+                          ? 'text-slate-300 cursor-not-allowed'
+                          : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                      }`}
                       disabled={index >= mockUserSubscription.maxPersonas}
+                      title={index >= mockUserSubscription.maxPersonas ? 'Cannot edit: Tier limit exceeded' : 'Edit persona'}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="text-slate-400 hover:text-red-500 transition-colors duration-200">
+                    <button 
+                      className={`transition-colors duration-200 ${
+                        index >= mockUserSubscription.maxPersonas
+                          ? 'text-slate-300 cursor-not-allowed'
+                          : 'text-slate-400 hover:text-red-500'
+                      }`}
+                      disabled={index >= mockUserSubscription.maxPersonas}
+                      title={index >= mockUserSubscription.maxPersonas ? 'Cannot delete: Tier limit exceeded' : 'Delete persona'}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
