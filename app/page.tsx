@@ -29,6 +29,9 @@ export default function Home() {
                   <Link href="/templates" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors duration-200">
                     Templates
                   </Link>
+                  <Link href="/personas" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors duration-200">
+                    Personas
+                  </Link>
                   <Link href="#about" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors duration-200">
                     About
                   </Link>
