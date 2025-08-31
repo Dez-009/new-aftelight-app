@@ -34,6 +34,13 @@ interface Persona {
 
 interface PersonasListProps {
   onCreateNew: () => void
+  personas?: Persona[]
+  userSubscription?: {
+    tier: 'free' | 'premium' | 'religious' | 'healthcare'
+    maxPersonas: number
+    currentPersonas: number
+    canCreateNew: boolean
+  }
 }
 
 // Mock data for development
@@ -67,31 +74,29 @@ const mockPersonas: Persona[] = [
   }
 ]
 
-export function PersonasList({ onCreateNew }: PersonasListProps) {
+export function PersonasList({ onCreateNew, personas: propPersonas, userSubscription: propUserSubscription }: PersonasListProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterBy, setFilterBy] = useState<'all' | 'public' | 'private'>('all')
-  const [personas] = useState<Persona[]>(mockPersonas)
-  const [userTier, setUserTier] = useState<'free' | 'premium' | 'religious' | 'healthcare'>('free')
-  const [personasLimit, setPersonasLimit] = useState(1)
+  
+  // Use props if provided, otherwise fall back to mock data
+  const personas = propPersonas || mockPersonas
+  const userSubscription = propUserSubscription || {
+    tier: 'free' as const,
+    maxPersonas: 1,
+    currentPersonas: personas.length,
+    canCreateNew: personas.length < 1
+  }
 
   const getUpgradeMessage = () => {
-    if (personas.length >= 1) {
+    if (personas.length >= userSubscription.maxPersonas) {
       return {
         type: 'limit-reached' as const,
-        message: `You've reached your limit of 1 persona(s) on the free tier.`,
+        message: `You've reached your limit of ${userSubscription.maxPersonas} persona(s) on the ${userSubscription.tier} tier.`,
         action: 'Upgrade to create more personas'
       }
     }
     return null
   }
-
-  // Mock user subscription data - in real app this comes from database
-  const mockUserSubscription = useMemo(() => ({
-    tier: 'free' as const,
-    maxPersonas: 1, // Fixed value for free tier
-    currentPersonas: personas.length,
-    canCreateNew: personas.length < 1
-  }), [personas.length])
 
 
 
@@ -106,9 +111,9 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
   })
 
   const handleCreateNew = () => {
-    if (!mockUserSubscription.canCreateNew) {
+    if (!userSubscription.canCreateNew) {
       // Show upgrade modal or redirect to subscription page
-      alert(`You've reached your limit of ${mockUserSubscription.maxPersonas} persona(s) on the ${mockUserSubscription.tier} tier. Please upgrade to create more personas.`)
+      alert(`You've reached your limit of ${userSubscription.maxPersonas} persona(s) on the ${userSubscription.tier} tier. Please upgrade to create more personas.`)
       return
     }
     onCreateNew()
@@ -145,25 +150,25 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
             My Personas
           </h2>
           <p className="text-slate-600 dark:text-slate-300">
-            {personas.length} of {mockUserSubscription.maxPersonas} personas
+            {personas.length} of {userSubscription.maxPersonas} personas
             <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">
-              • {mockUserSubscription.tier} tier limit: {mockUserSubscription.maxPersonas}
+              • {userSubscription.tier} tier limit: {userSubscription.maxPersonas}
             </span>
           </p>
         </div>
         
         <button
           onClick={handleCreateNew}
-          disabled={!mockUserSubscription.canCreateNew}
+          disabled={!userSubscription.canCreateNew}
           className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-lg ${
-            mockUserSubscription.canCreateNew
+            userSubscription.canCreateNew
               ? 'bg-amber-600 hover:bg-amber-700 text-white'
               : 'bg-slate-400 text-slate-200 cursor-not-allowed opacity-50'
           }`}
-          title={!mockUserSubscription.canCreateNew ? `Upgrade to create more than ${mockUserSubscription.maxPersonas} persona(s)` : 'Create a new persona'}
+          title={!userSubscription.canCreateNew ? `Upgrade to create more than ${userSubscription.maxPersonas} persona(s)` : 'Create a new persona'}
         >
           <Plus className="w-4 h-4" />
-          <span>{mockUserSubscription.canCreateNew ? 'Create New Persona' : 'Upgrade to Create More'}</span>
+          <span>{userSubscription.canCreateNew ? 'Create New Persona' : 'Upgrade to Create More'}</span>
         </button>
       </div>
 
@@ -244,7 +249,7 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
           {filteredPersonas.map((persona) => {
             // Find the original index of this persona in the full personas array
             const originalIndex = personas.findIndex(p => p.id === persona.id)
-            const exceedsLimit = originalIndex >= mockUserSubscription.maxPersonas
+            const exceedsLimit = originalIndex >= userSubscription.maxPersonas
             
             return (
             <div key={persona.id} className={`bg-white dark:bg-slate-700 rounded-xl border overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-105 ${
@@ -375,19 +380,19 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
               : 'Create your first persona to start preserving memories and building meaningful memorials'
             }
           </p>
-          {!searchTerm && filterBy === 'all' && (
-            <button
-              onClick={handleCreateNew}
-              disabled={!mockUserSubscription.canCreateNew}
-              className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-lg ${
-                mockUserSubscription.canCreateNew
-                  ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                  : 'bg-slate-400 text-slate-200 cursor-not-allowed'
-              }`}
-            >
-              Create Your First Persona
-            </button>
-          )}
+                      {!searchTerm && filterBy === 'all' && (
+              <button
+                onClick={handleCreateNew}
+                disabled={!userSubscription.canCreateNew}
+                className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-lg ${
+                  userSubscription.canCreateNew
+                    ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                    : 'bg-slate-400 text-slate-200 cursor-not-allowed'
+                }`}
+              >
+                Create Your First Persona
+              </button>
+            )}
         </div>
       )}
 
@@ -402,12 +407,12 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
                 : 'Unlock Unlimited Personas'
               }
             </h3>
-            <p className="text-amber-700 dark:text-amber-300 mb-4">
-              {upgradeMessage?.type === 'limit-reached'
-                ? `You've reached your ${mockUserSubscription.tier} tier limit. Upgrade to access all your personas and create new ones.`
-                : `You've created ${personas.length} persona(s). Upgrade to Premium to create unlimited personas and unlock AI-powered features.`
-              }
-            </p>
+                          <p className="text-amber-700 dark:text-amber-300 mb-4">
+                {upgradeMessage?.type === 'limit-reached'
+                  ? `You've reached your ${userSubscription.tier} tier limit. Upgrade to access all your personas and create new ones.`
+                  : `You've created ${personas.length} persona(s). Upgrade to Premium to create unlimited personas and unlock AI-powered features.`
+                }
+              </p>
             <div className="flex items-center justify-center space-x-6 text-sm text-amber-600 dark:text-amber-400">
               <div className="flex items-center space-x-2">
                 <Star className="w-4 h-4" />
