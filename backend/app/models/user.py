@@ -67,7 +67,7 @@ class User(Base):
     email_verified_at = Column(DateTime(timezone=True), nullable=True)
     
     # Relationships
-    personas = relationship("Persona", back_populates="user", cascade="all, delete-orphan")
+    personas = relationship("Persona", back_populates="user_relation", cascade="all, delete-orphan")
     memories = relationship("Memory", back_populates="user", cascade="all, delete-orphan")
     planning_sessions = relationship("PlanningSession", back_populates="user", cascade="all, delete-orphan")
     
