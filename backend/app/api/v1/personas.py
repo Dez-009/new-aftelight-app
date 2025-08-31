@@ -97,7 +97,7 @@ async def create_persona(
             id=str(uuid.uuid4()),
             user_id=current_user.id,
             name=persona_data.name,
-            relationship=persona_data.relationship,
+            relationship_type=persona_data.relationship_type,
             date_of_birth=persona_data.date_of_birth,
             date_of_passing=persona_data.date_of_passing,
             age_at_passing=persona_data.age_at_passing,

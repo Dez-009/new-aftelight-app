@@ -6,7 +6,7 @@ from app.models.persona import PersonaAccessStatus
 class PersonaBase(BaseModel):
     """Base persona schema"""
     name: str = Field(..., min_length=1, max_length=255, description="Persona name")
-    relationship: Optional[str] = Field(None, max_length=100, description="Relationship to user")
+    relationship_type: Optional[str] = Field(None, max_length=100, description="Relationship to user")
     date_of_birth: Optional[datetime] = Field(None, description="Date of birth")
     date_of_passing: Optional[datetime] = Field(None, description="Date of passing")
     age_at_passing: Optional[int] = Field(None, ge=0, le=150, description="Age at passing")
@@ -43,7 +43,7 @@ class PersonaCreate(PersonaBase):
 class PersonaUpdate(BaseModel):
     """Schema for updating a persona"""
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    relationship: Optional[str] = Field(None, max_length=100)
+    relationship_type: Optional[str] = Field(None, max_length=100)
     date_of_birth: Optional[datetime] = None
     date_of_passing: Optional[datetime] = None
     age_at_passing: Optional[int] = Field(None, ge=0, le=150)

@@ -20,7 +20,7 @@ class Persona(Base):
     
     # Basic information
     name = Column(String(255), nullable=False)
-    relationship = Column(String(100), nullable=True)
+    relationship_type = Column(String(100), nullable=True)
     date_of_birth = Column(DateTime, nullable=True)
     date_of_passing = Column(DateTime, nullable=True)
     age_at_passing = Column(Integer, nullable=True)
@@ -75,7 +75,7 @@ class Persona(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     
     # Relationships
-    user = relationship("User", back_populates="personas")
+    user_relation = relationship("User", back_populates="personas")
     memories = relationship("Memory", back_populates="persona", cascade="all, delete-orphan")
     media_files = relationship("Media", back_populates="persona", cascade="all, delete-orphan")
     
@@ -95,8 +95,8 @@ class Persona(Base):
     @property
     def display_name(self) -> str:
         """Get display name with relationship"""
-        if self.relationship:
-            return f"{self.name} ({self.relationship})"
+        if self.relationship_type:
+            return f"{self.name} ({self.relationship_type})"
         return self.name
     
     def lock(self, reason: str = None):
