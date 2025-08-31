@@ -119,7 +119,10 @@ export default function NewPrintOrder() {
       products: prev.products.map((product, i) => 
         i === index ? { 
           ...product, 
-          customization: { ...product.customization, [field]: value }
+          customization: { 
+            ...(product.customization || {}), 
+            [field]: value 
+          }
         } : product
       )
     }))
@@ -515,7 +518,7 @@ export default function NewPrintOrder() {
                       Custom Text
                     </label>
                     <textarea
-                      value={product.customization.text}
+                      value={product.customization.text || ''}
                       onChange={(e) => updateProductCustomization(index, 'text', e.target.value)}
                       rows={3}
                       className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200"
@@ -532,9 +535,9 @@ export default function NewPrintOrder() {
                         <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Primary</label>
                         <input
                           type="color"
-                          value={product.customization.colors.primary}
+                          value={product.customization.colors?.primary || '#2C3E50'}
                           onChange={(e) => updateProductCustomization(index, 'colors', {
-                            ...product.customization.colors,
+                            ...(product.customization.colors || {}),
                             primary: e.target.value
                           })}
                           className="w-full h-10 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer"
@@ -544,9 +547,9 @@ export default function NewPrintOrder() {
                         <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Secondary</label>
                         <input
                           type="color"
-                          value={product.customization.colors.secondary}
+                          value={product.customization.colors?.secondary || '#E74C3C'}
                           onChange={(e) => updateProductCustomization(index, 'colors', {
-                            ...product.customization.colors,
+                            ...(product.customization.colors || {}),
                             secondary: e.target.value
                           })}
                           className="w-full h-10 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer"
@@ -556,9 +559,9 @@ export default function NewPrintOrder() {
                         <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Accent</label>
                         <input
                           type="color"
-                          value={product.customization.colors.accent}
+                          value={product.customization.colors?.accent || '#F39C12'}
                           onChange={(e) => updateProductCustomization(index, 'colors', {
-                            ...product.customization.colors,
+                            ...(product.customization.colors || {}),
                             accent: e.target.value
                           })}
                           className="w-full h-10 border border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer"
@@ -572,7 +575,7 @@ export default function NewPrintOrder() {
                       Special Instructions
                     </label>
                     <textarea
-                      value={product.customization.specialInstructions}
+                      value={product.customization.specialInstructions || ''}
                       onChange={(e) => updateProductCustomization(index, 'specialInstructions', e.target.value)}
                       rows={2}
                       className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200"
@@ -659,7 +662,7 @@ export default function NewPrintOrder() {
                 </div>
               )}
 
-              {(formData.delivery.method === 'local-delivery' || formData.delivery.method === 'shipping') && (
+              {(formData.delivery.method !== 'pickup') && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -872,7 +875,7 @@ export default function NewPrintOrder() {
                       <span className="ml-2 text-slate-900 dark:text-white">{formData.delivery.pickupLocation}</span>
                     </div>
                   )}
-                  {(formData.delivery.method === 'local-delivery' || formData.delivery.method === 'shipping') && (
+                  {(formData.delivery.method !== 'pickup') && (
                     <div>
                       <span className="text-slate-500 dark:text-slate-400">Address:</span>
                       <span className="ml-2 text-slate-900 dark:text-white">
