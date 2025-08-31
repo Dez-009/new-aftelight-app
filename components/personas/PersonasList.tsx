@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { 
   Plus, 
   Search, 
@@ -74,13 +74,26 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
   const [userTier, setUserTier] = useState<'free' | 'premium' | 'religious' | 'healthcare'>('free')
   const [personasLimit, setPersonasLimit] = useState(1)
 
+  const getUpgradeMessage = () => {
+    if (personas.length >= 1) {
+      return {
+        type: 'limit-reached' as const,
+        message: `You've reached your limit of 1 persona(s) on the free tier.`,
+        action: 'Upgrade to create more personas'
+      }
+    }
+    return null
+  }
+
   // Mock user subscription data - in real app this comes from database
-  const mockUserSubscription = {
+  const mockUserSubscription = useMemo(() => ({
     tier: 'free' as const,
     maxPersonas: 1, // Fixed value for free tier
     currentPersonas: personas.length,
     canCreateNew: personas.length < 1
-  }
+  }), [personas.length])
+
+
 
   const filteredPersonas = personas.filter(persona => {
     const matchesSearch = persona.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -99,23 +112,6 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
       return
     }
     onCreateNew()
-  }
-
-  const getUpgradeMessage = () => {
-    if (mockUserSubscription.currentPersonas >= mockUserSubscription.maxPersonas) {
-      return {
-        type: 'limit-reached' as const,
-        message: `You've reached your limit of ${mockUserSubscription.maxPersonas} persona(s) on the ${mockUserSubscription.tier} tier.`,
-        action: 'Upgrade to create more personas'
-      }
-    } else if (mockUserSubscription.currentPersonas >= mockUserSubscription.maxPersonas * 0.8) {
-      return {
-        type: 'approaching-limit' as const,
-        message: `You're approaching your limit (${mockUserSubscription.currentPersonas}/${mockUserSubscription.maxPersonas} personas).`,
-        action: 'Consider upgrading for unlimited personas'
-      }
-    }
-    return null
   }
 
   const upgradeMessage = getUpgradeMessage()
@@ -162,7 +158,7 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
           className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-lg ${
             mockUserSubscription.canCreateNew
               ? 'bg-amber-600 hover:bg-amber-700 text-white'
-              : 'bg-slate-400 text-slate-200 cursor-not-allowed'
+              : 'bg-slate-400 text-slate-200 cursor-not-allowed opacity-50'
           }`}
           title={!mockUserSubscription.canCreateNew ? `Upgrade to create more than ${mockUserSubscription.maxPersonas} persona(s)` : 'Create a new persona'}
         >
