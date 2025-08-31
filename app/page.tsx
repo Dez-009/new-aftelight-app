@@ -26,6 +26,9 @@ export default function Home() {
                   <Link href="/planner/demo" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors duration-200">
                     Demo
                   </Link>
+                  <Link href="/design-studio" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors duration-200">
+                    Design Studio
+                  </Link>
                   <Link href="#about" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-colors duration-200">
                     About
                   </Link>
