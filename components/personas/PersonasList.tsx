@@ -77,9 +77,9 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
   // Mock user subscription data - in real app this comes from database
   const mockUserSubscription = {
     tier: 'free' as const,
-    maxPersonas: personasLimit,
+    maxPersonas: 1, // Fixed value for free tier
     currentPersonas: personas.length,
-    canCreateNew: personas.length < personasLimit
+    canCreateNew: personas.length < 1
   }
 
   const filteredPersonas = personas.filter(persona => {
@@ -245,9 +245,14 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
       {/* Personas Grid */}
       {filteredPersonas.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPersonas.map((persona, index) => (
+          {filteredPersonas.map((persona) => {
+            // Find the original index of this persona in the full personas array
+            const originalIndex = personas.findIndex(p => p.id === persona.id)
+            const exceedsLimit = originalIndex >= mockUserSubscription.maxPersonas
+            
+            return (
             <div key={persona.id} className={`bg-white dark:bg-slate-700 rounded-xl border overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-105 ${
-              index >= mockUserSubscription.maxPersonas
+              exceedsLimit
                 ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
                 : 'border-slate-200 dark:border-slate-600'
             }`}>
@@ -261,7 +266,7 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
                     <p className="text-amber-600 dark:text-amber-400 font-medium">
                       {persona.relationshipToUser}
                     </p>
-                    {index >= mockUserSubscription.maxPersonas && (
+                    {exceedsLimit && (
                       <span className="inline-block mt-2 px-2 py-1 bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-300 text-xs rounded-full">
                         Tier Limit Exceeded
                       </span>
@@ -278,23 +283,23 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
                     )}
                     <button 
                       className={`transition-colors duration-200 ${
-                        index >= mockUserSubscription.maxPersonas
+                        exceedsLimit
                           ? 'text-slate-300 cursor-not-allowed'
                           : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                       }`}
-                      disabled={index >= mockUserSubscription.maxPersonas}
-                      title={index >= mockUserSubscription.maxPersonas ? 'Cannot edit: Tier limit exceeded' : 'Edit persona'}
+                      disabled={exceedsLimit}
+                      title={exceedsLimit ? 'Cannot edit: Tier limit exceeded' : 'Edit persona'}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button 
                       className={`transition-colors duration-200 ${
-                        index >= mockUserSubscription.maxPersonas
+                        exceedsLimit
                           ? 'text-slate-300 cursor-not-allowed'
                           : 'text-slate-400 hover:text-red-500'
                       }`}
-                      disabled={index >= mockUserSubscription.maxPersonas}
-                      title={index >= mockUserSubscription.maxPersonas ? 'Cannot delete: Tier limit exceeded' : 'Delete persona'}
+                      disabled={exceedsLimit}
+                      title={exceedsLimit ? 'Cannot delete: Tier limit exceeded' : 'Delete persona'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -357,7 +362,8 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
                 </div>
               </div>
             </div>
-          ))}
+          )
+        })}
         </div>
       ) : (
         <div className="text-center py-12">
