@@ -13,7 +13,8 @@ import {
   Calendar,
   User,
   Camera,
-  Mic
+  Mic,
+  Settings
 } from 'lucide-react'
 
 interface Persona {
@@ -70,6 +71,16 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterBy, setFilterBy] = useState<'all' | 'public' | 'private'>('all')
   const [personas] = useState<Persona[]>(mockPersonas)
+  const [userTier, setUserTier] = useState<'free' | 'premium' | 'religious' | 'healthcare'>('free')
+  const [personasLimit, setPersonasLimit] = useState(1)
+
+  // Mock user subscription data - in real app this comes from database
+  const mockUserSubscription = {
+    tier: 'free' as const,
+    maxPersonas: 1,
+    currentPersonas: personas.length,
+    canCreateNew: personas.length < 1
+  }
 
   const filteredPersonas = personas.filter(persona => {
     const matchesSearch = persona.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,6 +91,34 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
     
     return matchesSearch && matchesFilter
   })
+
+  const handleCreateNew = () => {
+    if (!mockUserSubscription.canCreateNew) {
+      // Show upgrade modal or redirect to subscription page
+      alert(`You've reached your limit of ${mockUserSubscription.maxPersonas} persona(s) on the ${mockUserSubscription.tier} tier. Please upgrade to create more personas.`)
+      return
+    }
+    onCreateNew()
+  }
+
+  const getUpgradeMessage = () => {
+    if (mockUserSubscription.currentPersonas >= mockUserSubscription.maxPersonas) {
+      return {
+        type: 'limit-reached' as const,
+        message: `You've reached your limit of ${mockUserSubscription.maxPersonas} persona(s) on the ${mockUserSubscription.tier} tier.`,
+        action: 'Upgrade to create more personas'
+      }
+    } else if (mockUserSubscription.currentPersonas >= mockUserSubscription.maxPersonas * 0.8) {
+      return {
+        type: 'approaching-limit' as const,
+        message: `You're approaching your limit (${mockUserSubscription.currentPersonas}/${mockUserSubscription.maxPersonas} personas).`,
+        action: 'Consider upgrading for unlimited personas'
+      }
+    }
+    return null
+  }
+
+  const upgradeMessage = getUpgradeMessage()
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -111,17 +150,71 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
           </h2>
           <p className="text-slate-600 dark:text-slate-300">
             {filteredPersonas.length} of {personas.length} personas
+            {upgradeMessage && (
+              <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">
+                • {mockUserSubscription.tier} tier limit: {mockUserSubscription.maxPersonas}
+              </span>
+            )}
           </p>
         </div>
         
         <button
-          onClick={onCreateNew}
-          className="flex items-center space-x-2 px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-lg"
+          onClick={handleCreateNew}
+          disabled={!mockUserSubscription.canCreateNew}
+          className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-lg ${
+            mockUserSubscription.canCreateNew
+              ? 'bg-amber-600 hover:bg-amber-700 text-white'
+              : 'bg-slate-400 text-slate-200 cursor-not-allowed'
+          }`}
         >
           <Plus className="w-4 h-4" />
           <span>Create New Persona</span>
         </button>
       </div>
+
+      {/* Downgrade Warning */}
+      {upgradeMessage && (
+        <div className={`rounded-xl border p-4 ${
+          upgradeMessage.type === 'limit-reached'
+            ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700'
+            : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700'
+        }`}>
+          <div className="flex items-start space-x-3">
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+              upgradeMessage.type === 'limit-reached'
+                ? 'bg-red-500 text-white'
+                : 'bg-amber-500 text-white'
+            }`}>
+              {upgradeMessage.type === 'limit-reached' ? '!' : 'i'}
+            </div>
+            <div className="flex-1">
+              <h4 className={`font-medium ${
+                upgradeMessage.type === 'limit-reached'
+                  ? 'text-red-800 dark:text-red-200'
+                  : 'text-amber-800 dark:text-amber-200'
+              }`}>
+                {upgradeMessage.type === 'limit-reached' ? 'Limit Reached' : 'Approaching Limit'}
+              </h4>
+              <p className={`text-sm mt-1 ${
+                upgradeMessage.type === 'limit-reached'
+                  ? 'text-red-700 dark:text-red-300'
+                  : 'text-amber-700 dark:text-amber-300'
+              }`}>
+                {upgradeMessage.message}
+              </p>
+              <div className="mt-3">
+                <button className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:scale-105 ${
+                  upgradeMessage.type === 'limit-reached'
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    : 'bg-amber-600 hover:bg-amber-700 text-white'
+                }`}>
+                  {upgradeMessage.action}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -153,8 +246,12 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
       {/* Personas Grid */}
       {filteredPersonas.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPersonas.map((persona) => (
-            <div key={persona.id} className="bg-white dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600 overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-105">
+          {filteredPersonas.map((persona, index) => (
+            <div key={persona.id} className={`bg-white dark:bg-slate-700 rounded-xl border overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-105 ${
+              index >= mockUserSubscription.maxPersonas
+                ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
+                : 'border-slate-200 dark:border-slate-600'
+            }`}>
               {/* Header */}
               <div className="p-6 border-b border-slate-200 dark:border-slate-600">
                 <div className="flex items-start justify-between mb-3">
@@ -165,12 +262,25 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
                     <p className="text-amber-600 dark:text-amber-400 font-medium">
                       {persona.relationshipToUser}
                     </p>
+                    {index >= mockUserSubscription.maxPersonas && (
+                      <span className="inline-block mt-2 px-2 py-1 bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-300 text-xs rounded-full">
+                        Tier Limit Exceeded
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center space-x-2">
                     {persona.isPublic && (
-                      <Eye className="w-4 h-4 text-blue-500" title="Public" />
+                      <div className="relative group">
+                        <Eye className="w-4 h-4 text-blue-500" aria-label="Public persona" />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                          Public
+                        </div>
+                      </div>
                     )}
-                    <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200">
+                    <button 
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors duration-200"
+                      disabled={index >= mockUserSubscription.maxPersonas}
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button className="text-slate-400 hover:text-red-500 transition-colors duration-200">
@@ -253,8 +363,13 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
           </p>
           {!searchTerm && filterBy === 'all' && (
             <button
-              onClick={onCreateNew}
-              className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-lg"
+              onClick={handleCreateNew}
+              disabled={!mockUserSubscription.canCreateNew}
+              className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:scale-105 shadow-lg ${
+                mockUserSubscription.canCreateNew
+                  ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                  : 'bg-slate-400 text-slate-200 cursor-not-allowed'
+              }`}
             >
               Create Your First Persona
             </button>
@@ -268,14 +383,36 @@ export function PersonasList({ onCreateNew }: PersonasListProps) {
           <div className="text-center">
             <Star className="w-8 h-8 text-amber-600 dark:text-amber-400 mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-amber-800 dark:text-amber-200 mb-2">
-              Unlock Unlimited Personas
+              {upgradeMessage?.type === 'limit-reached' 
+                ? 'Upgrade Required to Continue'
+                : 'Unlock Unlimited Personas'
+              }
             </h3>
             <p className="text-amber-700 dark:text-amber-300 mb-4">
-              You've created {personas.length} persona. Upgrade to Premium to create unlimited personas and unlock AI-powered features.
+              {upgradeMessage?.type === 'limit-reached'
+                ? `You've reached your ${mockUserSubscription.tier} tier limit. Upgrade to access all your personas and create new ones.`
+                : `You've created ${personas.length} persona(s). Upgrade to Premium to create unlimited personas and unlock AI-powered features.`
+              }
             </p>
-            <button className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition-all duration-200 hover:scale-105">
-              Upgrade to Premium
-            </button>
+            <div className="flex items-center justify-center space-x-6 text-sm text-amber-600 dark:text-amber-400">
+              <div className="flex items-center space-x-2">
+                <Star className="w-4 h-4" />
+                <span>AI Memory Analysis</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Heart className="w-4 h-4" />
+                <span>Family Collaboration</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Settings className="w-4 h-4" />
+                <span>Advanced Customization</span>
+              </div>
+            </div>
+            <div className="mt-4">
+              <button className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition-all duration-200 hover:scale-105">
+                {upgradeMessage?.type === 'limit-reached' ? 'Upgrade Now' : 'Upgrade to Premium'}
+              </button>
+            </div>
           </div>
         </div>
       )}

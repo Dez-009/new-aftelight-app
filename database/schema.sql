@@ -66,6 +66,11 @@ CREATE TABLE personas (
     achievements TEXT[],
     personality_traits TEXT[],
     is_public BOOLEAN DEFAULT false,
+    -- Downgrade handling fields
+    access_status VARCHAR(50) DEFAULT 'active', -- 'active', 'locked', 'archived'
+    locked_at TIMESTAMP WITH TIME ZONE,
+    locked_reason VARCHAR(255), -- 'downgrade', 'admin_action', 'payment_issue'
+    priority_order INTEGER DEFAULT 0, -- For determining which personas to keep active
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     created_by UUID REFERENCES users(id),
