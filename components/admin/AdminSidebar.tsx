@@ -13,7 +13,8 @@ import {
   Calendar,
   Heart,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Palette
 } from 'lucide-react'
 import { AfterLightIcon } from '../AfterLightIcon'
 
@@ -54,13 +55,20 @@ const navigation: NavItem[] = [
     description: 'Manage cultural presets',
     roles: ['SUPER_ADMIN', 'ADMIN']
   },
-  {
-    name: 'Print Services',
-    href: '/admin/printing',
-    icon: Printer,
-    description: 'Same-day copy automation',
-    roles: ['SUPER_ADMIN', 'ADMIN']
-  },
+        {
+        name: 'Print Services',
+        href: '/admin/printing',
+        icon: Printer,
+        description: 'Same-day copy automation',
+        roles: ['SUPER_ADMIN', 'ADMIN']
+      },
+      {
+        name: 'Templates',
+        href: '/admin/templates',
+        icon: Palette,
+        description: 'Design template management',
+        roles: ['SUPER_ADMIN', 'ADMIN']
+      },
   {
     name: 'Revenue Tracking',
     href: '/admin/revenue',
