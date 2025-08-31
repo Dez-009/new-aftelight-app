@@ -16,6 +16,8 @@ import {
   Mic,
   Settings
 } from 'lucide-react'
+import { Avatar } from '@/components/ui/Avatar'
+import { avatarService } from '@/lib/avatarService'
 
 interface Persona {
   id: string
@@ -30,6 +32,7 @@ interface Persona {
   culturalBackground: string
   createdAt: string
   isPublic: boolean
+  avatarUrl?: string | null
 }
 
 interface PersonasListProps {
@@ -57,7 +60,8 @@ const mockPersonas: Persona[] = [
     voiceRecordingsCount: 3,
     culturalBackground: 'Christian',
     createdAt: '2024-01-15',
-    isPublic: false
+    isPublic: false,
+    avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face'
   },
   {
     id: '2',
@@ -70,7 +74,8 @@ const mockPersonas: Persona[] = [
     voiceRecordingsCount: 2,
     culturalBackground: 'Buddhist',
     createdAt: '2024-02-20',
-    isPublic: false
+    isPublic: false,
+    avatarUrl: null
   }
 ]
 
@@ -117,6 +122,36 @@ export function PersonasList({ onCreateNew, personas: propPersonas, userSubscrip
       return
     }
     onCreateNew()
+  }
+
+  const handleAvatarChange = async (personaId: string, file: File | null) => {
+    try {
+      if (file) {
+        const result = await avatarService.uploadAvatar(personaId, file)
+        if (result.success && result.avatarUrl) {
+          // Update the persona's avatar in the local state
+          const updatedPersonas = personas.map(p => 
+            p.id === personaId ? { ...p, avatarUrl: result.avatarUrl } : p
+          )
+          // In a real app, you'd update the state through a callback or context
+          console.log('Avatar updated successfully:', result.avatarUrl)
+        }
+      } else {
+        // Remove avatar
+        const result = await avatarService.removeAvatar(personaId)
+        if (result.success) {
+          // Update the persona's avatar in the local state
+          const updatedPersonas = personas.map(p => 
+            p.id === personaId ? { ...p, avatarUrl: null } : p
+          )
+          // In a real app, you'd update the state through a callback or context
+          console.log('Avatar removed successfully')
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update avatar:', error)
+      alert('Failed to update avatar. Please try again.')
+    }
   }
 
   const upgradeMessage = getUpgradeMessage()
@@ -260,18 +295,32 @@ export function PersonasList({ onCreateNew, personas: propPersonas, userSubscrip
               {/* Header */}
               <div className="p-6 border-b border-slate-200 dark:border-slate-600">
                 <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-1">
-                      {persona.name}
-                    </h3>
-                    <p className="text-amber-600 dark:text-amber-400 font-medium">
-                      {persona.relationshipToUser}
-                    </p>
-                    {exceedsLimit && (
-                      <span className="inline-block mt-2 px-2 py-1 bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-300 text-xs rounded-full">
-                        Tier Limit Exceeded
-                      </span>
-                    )}
+                  <div className="flex items-start space-x-4 flex-1">
+                    {/* Avatar */}
+                    <Avatar
+                      src={persona.avatarUrl}
+                      alt={persona.name}
+                      size="lg"
+                      editable={!exceedsLimit}
+                      disabled={exceedsLimit}
+                      onAvatarChange={(file) => handleAvatarChange(persona.id, file)}
+                      className="flex-shrink-0"
+                    />
+                    
+                    {/* Persona Info */}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-1">
+                        {persona.name}
+                      </h3>
+                      <p className="text-amber-600 dark:text-amber-400 font-medium">
+                        {persona.relationshipToUser}
+                      </p>
+                      {exceedsLimit && (
+                        <span className="inline-block mt-2 px-2 py-1 bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-300 text-xs rounded-full">
+                          Tier Limit Exceeded
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     {persona.isPublic && (

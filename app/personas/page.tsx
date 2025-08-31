@@ -23,7 +23,8 @@ export default function PersonasPage() {
       voiceRecordingsCount: 3,
       culturalBackground: 'Christian',
       createdAt: '2024-01-15',
-      isPublic: false
+      isPublic: false,
+      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face'
     },
     {
       id: '2',
@@ -36,7 +37,8 @@ export default function PersonasPage() {
       voiceRecordingsCount: 2,
       culturalBackground: 'Buddhist',
       createdAt: '2024-02-20',
-      isPublic: false
+      isPublic: false,
+      avatarUrl: null
     }
   ]
 
