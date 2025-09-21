@@ -43,7 +43,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=["*"] if settings.ENVIRONMENT == "development" else settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -51,9 +51,17 @@ app.add_middleware(
 
 # Add trusted host middleware for production
 if settings.ENVIRONMENT == "production":
+    # Allow Railway's health check domain
+    allowed_hosts = list(settings.ALLOWED_HOSTS)
+    allowed_hosts.extend([
+        "100.64.0.2",  # Railway's health check IP
+        "railway.internal",
+        "*.railway.app",
+        "*.up.railway.app"
+    ])
     app.add_middleware(
         TrustedHostMiddleware,
-        allowed_hosts=settings.ALLOWED_HOSTS
+        allowed_hosts=allowed_hosts
     )
 
 # Add custom middleware
@@ -80,10 +88,25 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 # Health check endpoint
-@app.get("/health")
-async def health_check():
+@app.get("/health", include_in_schema=True)
+async def health_check(request: Request):
     global request_count
     request_count += 1
+    
+    # Get client IP and user agent for logging
+    client_ip = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent", "unknown")
+    
+    # Log health check request
+    print(f"🏥 Health check from {client_ip} ({user_agent})")
+    
+    # Get environment info
+    env_info = {
+        "environment": settings.ENVIRONMENT,
+        "debug": settings.DEBUG,
+        "allowed_origins": settings.ALLOWED_ORIGINS,
+        "allowed_hosts": settings.ALLOWED_HOSTS
+    }
     
     return {
         "success": True,
@@ -91,7 +114,8 @@ async def health_check():
         "timestamp": time.time(),
         "uptime": time.time() - start_time,
         "requests_processed": request_count,
-        "version": "1.1.0"
+        "version": "1.1.0",
+        "environment": env_info
     }
 
 # API information endpoint
