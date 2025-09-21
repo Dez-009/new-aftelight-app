@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
-from typing import List, Optional
+from pydantic import field_validator
+from typing import List, Optional, Union
 import os
 
 class Settings(BaseSettings):
@@ -81,6 +82,20 @@ class Settings(BaseSettings):
     PRINTFUL_API_KEY: Optional[str] = None
     LOB_API_KEY: Optional[str] = None
     
+    @field_validator('ALLOWED_ORIGINS', mode='before')
+    @classmethod
+    def parse_allowed_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(',') if origin.strip()]
+        return v
+    
+    @field_validator('ALLOWED_HOSTS', mode='before')
+    @classmethod
+    def parse_allowed_hosts(cls, v):
+        if isinstance(v, str):
+            return [host.strip() for host in v.split(',') if host.strip()]
+        return v
+
     class Config:
         env_file = ".env"
         case_sensitive = True
