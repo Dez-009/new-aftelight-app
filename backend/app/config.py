@@ -21,20 +21,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # CORS
-    ALLOWED_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "https://afterlight.app",
-        "https://www.afterlight.app"
-    ]
+    ALLOWED_ORIGINS: Union[str, List[str]] = "http://localhost:3000,http://localhost:3001"
     
     # Trusted hosts for production
-    ALLOWED_HOSTS: List[str] = [
-        "localhost",
-        "127.0.0.1",
-        "afterlight.app",
-        "www.afterlight.app"
-    ]
+    ALLOWED_HOSTS: Union[str, List[str]] = "localhost,127.0.0.1"
     
     # Database
     DATABASE_URL: Optional[str] = None
@@ -82,19 +72,17 @@ class Settings(BaseSettings):
     PRINTFUL_API_KEY: Optional[str] = None
     LOB_API_KEY: Optional[str] = None
     
-    @field_validator('ALLOWED_ORIGINS', mode='before')
+    @field_validator('ALLOWED_ORIGINS', 'ALLOWED_HOSTS')
     @classmethod
-    def parse_allowed_origins(cls, v):
+    def parse_comma_separated_list(cls, v: Union[str, List[str]]) -> List[str]:
         if isinstance(v, str):
-            return [origin.strip() for origin in v.split(',') if origin.strip()]
-        return v
-    
-    @field_validator('ALLOWED_HOSTS', mode='before')
-    @classmethod
-    def parse_allowed_hosts(cls, v):
-        if isinstance(v, str):
-            return [host.strip() for host in v.split(',') if host.strip()]
-        return v
+            # Split by comma and clean up each item
+            items = [item.strip() for item in v.split(',')]
+            # Remove empty items and return
+            return [item for item in items if item]
+        elif isinstance(v, list):
+            return v
+        return []  # Return empty list as fallback
 
     class Config:
         env_file = ".env"
@@ -132,12 +120,13 @@ settings = Settings()
 # Environment-specific overrides
 if settings.ENVIRONMENT == "production":
     settings.DEBUG = False
-    settings.ALLOWED_ORIGINS = [
-        "https://afterlight.app",
-        "https://www.afterlight.app"
-    ]
+    # Only override if not set via environment variable
+    if not os.getenv('ALLOWED_ORIGINS'):
+        settings.ALLOWED_ORIGINS = "https://afterlight.app,https://www.afterlight.app"
+    if not os.getenv('ALLOWED_HOSTS'):
+        settings.ALLOWED_HOSTS = "afterlight.app,www.afterlight.app"
 elif settings.ENVIRONMENT == "staging":
-    settings.ALLOWED_ORIGINS = [
-        "https://staging.afterlight.app",
-        "https://staging-www.afterlight.app"
-    ]
+    if not os.getenv('ALLOWED_ORIGINS'):
+        settings.ALLOWED_ORIGINS = "https://staging.afterlight.app,https://staging-www.afterlight.app"
+    if not os.getenv('ALLOWED_HOSTS'):
+        settings.ALLOWED_HOSTS = "staging.afterlight.app,staging-www.afterlight.app"
