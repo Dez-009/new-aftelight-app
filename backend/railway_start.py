@@ -78,18 +78,18 @@ def main():
         print("❌ Startup failed due to missing environment variables")
         sys.exit(1)
     
-            # Get port from Railway (handle both $PORT and actual port)
-        port_str = os.getenv('PORT', '8000')
-        
-        # Handle case where Railway might pass literal $PORT
-        if port_str == '$PORT':
-            port_str = '8000'
-        
-        try:
-            port = int(port_str)
-        except ValueError:
-            print(f"⚠️ Invalid PORT value: {port_str}, using default 8000")
-            port = 8000
+    # Get port from Railway (handle both $PORT and actual port)
+    port_str = os.getenv('PORT', '8000')
+    
+    # Handle case where Railway might pass literal $PORT
+    if port_str == '$PORT':
+        port_str = '8000'
+    
+    try:
+        port = int(port_str)
+    except ValueError:
+        print(f"⚠️ Invalid PORT value: {port_str}, using default 8000")
+        port = 8000
     
     print(f"✅ Environment setup complete")
     print(f"🌐 Starting server on port {port}")
