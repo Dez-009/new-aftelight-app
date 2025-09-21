@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/backend
 
 # Set work directory
 WORKDIR /app
@@ -19,15 +19,15 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY requirements.txt .
+COPY backend/requirements.txt ./backend/
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install --no-cache-dir -r backend/requirements.txt
 
-# Copy project
-COPY . .
+# Copy backend project
+COPY backend/ ./backend/
 
 # Create uploads directory
-RUN mkdir -p uploads
+RUN mkdir -p backend/uploads
 
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser \
@@ -42,4 +42,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Run the application using Railway startup script
+WORKDIR /app/backend
 CMD ["python", "railway_start.py"]
